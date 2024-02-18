@@ -28,19 +28,6 @@ let leftMsgNumber = 0;
 
 
 
-
-const getData = async () => {
-    let allMsgs = await Msg.find({});
-    let readMsgs = await Msg.find({ read: true });
-    readMsgNumber = readMsgs.length;
-    leftMsgNumber = allMsgs.length - readMsgNumber;
-}
-
-
-getData();
-
-
-
 app.get('/', (req, res) => {
     res.render('index', { message, readMsgNumber, leftMsgNumber });
 })
@@ -48,6 +35,10 @@ app.get('/', (req, res) => {
 
 app.get('/msg', async (req, res) => {
     let newMessage = await Msg.findOne({ read: false });
+    let allMsgs = await Msg.find({});
+    let readMsgs = await Msg.find({ read: true });
+    readMsgNumber = readMsgs.length+1;
+    leftMsgNumber = allMsgs.length - readMsgNumber;
 
     if (!newMessage) {
         message = "You Read All Messages"
@@ -55,8 +46,6 @@ app.get('/msg', async (req, res) => {
         message = newMessage.msg;
         newMessage.read = true;
         await newMessage.save();
-        readMsgNumber++;
-        leftMsgNumber--;
     }
     res.redirect('/')
 })
